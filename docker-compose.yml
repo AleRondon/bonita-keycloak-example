@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:19.0.1
+    command:
+      [
+        'start-dev',
+        '--import-realm'
+      ]
+    volumes:
+      - ./keycloak/realm-config:/opt/keycloak/data/import:rw
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports:
+      - 9090:8080
+    networks:
+      - docker_bonita_backend
+
+  bonita-sso:
+    image: demo-from-scratch-production:0.0.1
+    hostname: bonita
+    volumes:
+      - ~/bonita-lic/9.0:/opt/bonita_lic/
+      - ./bonita/conf/:/opt/custom-config.d/
+    ports:
+      - 8090:8080
+    environment:
+      - TENANT_LOGIN=install
+      - TENANT_PASSWORD=install
+    restart: on-failure:2
+    depends_on:
+      - keycloak
+    networks:
+      - docker_bonita_backend
+  
+  greenmail:
+    image: greenmail/standalone:1.6.0
+    ports:
+      - 2525:3025
+      - 3110:3110
+      - 3143:3143 
+      - 3465:3465
+      - 3993:3993
+      - 3995:3995 
+    networks:
+      - docker_bonita_backend
+
+  roundcude:
+    image: roundcube/roundcubemail:latest
+    environment:
+      - ROUNDCUBEMAIL_SMTP_SERVER=greenmail
+      - ROUNDCUBEMAIL_SMTP_PORT=3025  
+      - ROUNDCUBEMAIL_DEFAULT_HOST=greenmail
+      - ROUNDCUBEMAIL_DEFAULT_PORT=3143 
+    ports:
+      - 8088:80
+    depends_on:
+      - greenmail
+    networks:
+      - docker_bonita_backend
+
+networks:
+  docker_bonita_backend:
+    name: docker_bonita_backend
+
