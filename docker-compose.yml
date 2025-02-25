@@ -23,7 +23,7 @@ services:
     image: #demo-from-scratch-production:0.0.1
     hostname: bonita
     volumes:
-      - ~/bonita-lic/10.2:/opt/bonita_lic/
+      - ./bonita/lic/:/opt/bonita_lic/
       - ./bonita/conf/:/opt/custom-config.d/
     ports:
       - 8090:8080
