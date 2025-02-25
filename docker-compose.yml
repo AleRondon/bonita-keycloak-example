@@ -1,5 +1,4 @@
-version: '3'
-
+name: bonita-sso
 services:
 
   keycloak:
@@ -20,10 +19,11 @@ services:
       - docker_bonita_backend
 
   bonita-sso:
-    image: demo-from-scratch-production:0.0.1
+    #update valid Bonita Docker Image
+    image: #demo-from-scratch-production:0.0.1
     hostname: bonita
     volumes:
-      - ~/bonita-lic/9.0:/opt/bonita_lic/
+      - ~/bonita-lic/10.2:/opt/bonita_lic/
       - ./bonita/conf/:/opt/custom-config.d/
     ports:
       - 8090:8080
